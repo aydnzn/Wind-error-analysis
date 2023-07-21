@@ -1,8 +1,32 @@
 # Wind Error Assessment
 
-Welcome to the Wind Error Assessment project. This repository contains scripts and data for assessing wind measurement errors.
+This project was carried out during my research internship at the [Associate Professorship of Environmental Sensing and Modeling](https://www.ee.cit.tum.de/en/esm/home/) at the Technical University of Munich, TUM School of Computation, Information and Technology.
 
-For access to scripts and data locations, as well as a detailed readme for running the framework, please refer to [Run](./RUN.md).
+**Supervisors**: 
+- Prof. Dr.-Ing. Jia Chen
+- Dr. rer. nat. Friedrich Klappenbach
+- M.Sc. Andreas Forstmaier
+
+## Research Focus: Bayesian Inversion Framework Wind Error Analysis
+
+Throughout the research, I conducted wind error analysis, utilising MATLAB for numerical computations and visualizations, and R for statistical computing and graphics. Large-scale data manipulation was performed using various data handling tools such as NetCDF, Geos, Proj, SQLite, HDF5, GDAL, and PkgConf. 
+
+Shell scripting was used for managing job submissions on a SLURM cluster. This research project was primarily focused on atmospheric data processing, involving tasks such as creating weighted histograms, calculating daily differences, and rotating footprints to enhance the accuracy of the prediction model.
+
+## Publication 
+
+The project contributed to the following publication authored by M.Sc. Andreas Forstmaier:
+
+Forstmaier, A., Chen, J., Dietrich, F., Bettinelli, J., Maazallahi, H., Schneider, C., Winkler, D., Zhao, X., Jones, T., van der Veen, C., Wildmann, N., Makowski, M., Uzun, A., Klappenbach, F., Denier van der Gon, H., Schwietzke, S., & Röckmann, T. (2022). Quantification of methane emissions in Hamburg using a network of FTIR spectrometers and an inverse modeling approach. Copernicus GmbH. https://doi.org/10.5194/acp-2022-710
+
+## Repository Contents
+
+This repository contains the following:
+- Scripts
+- Data
+- Presentations
+
+For a detailed guide on how to run the framework, access to scripts, and data locations, please refer to [Run](./RUN.md).
 
 # LiDAR Measurements
 
@@ -29,9 +53,9 @@ As a result, three 3D arrays (one each for `WSPD`, `WDIR`, and `Z`) of size `[44
 
 # ERA5 Model Data
 
-The approach taken was to combine hourly ERA5 data on pressure levels with hourly ERA5 data on single levels.
+The approach taken was to combine [hourly ERA5 data on pressure levels](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-pressure-levels?tab=overview) with [hourly ERA5 data on single levels](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=overview).
 
-## ERA5 Hourly Data on Pressure Levels
+## [ERA5 Hourly Data on Pressure Levels](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-pressure-levels?tab=overview)
 
 This is gridded data on a latitude-longitude grid, so after reading the latitude and longitude values, the corresponding indices for the LiDAR location are identified. Instead of `Z` (measurement height above ground level in m) from LiDAR measurements, there are 37 pressure levels in millibars. The pressure levels range from 1000 hPa to 1 hPa. The temporal coverage consists of the 44 days of interest (from 01-Aug 2021 to 09-Sep-2021). 
 
@@ -40,7 +64,7 @@ ERA5 provides estimates for a large number of atmospheric, ocean-wave and land-s
 - `u` (U component of wind in m s^-1)
 - `v` (V component of wind in m s^-1)
 
-## ERA5 Hourly Data on Single Levels
+## [ERA5 Hourly Data on Single Levels](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=overview)
 
 Again, this gridded data needs to be mapped to the latitude and longitude corresponding to the LiDAR location. The temporal coverage consists of the 44 days of interest (from 01-Aug 2021 to 09-Sep-2021). Now, the variables of interest are `u100`, `v100`, `u10`, `v10` and `z`. 
 
@@ -87,13 +111,17 @@ To further investigate these mismatches, we have selected a specific hour from t
 
 ![Wind Speed Plot](./Data/WSPD_figures/wspd_06-Aug-2021_12_00_00.png)
 
-The above plot represents the relationship between horizontal wind speed and altitude. The complete set of wind speed plots can be found in the [Wind Speed Visualization](./Data/WSPD_figures) section.
+In these visualizations, the x-axis corresponds to the horizontal wind speed (in m/s) while the y-axis signifies the altitude (in m). Ticks on the y-axis denote particle release heights and horizontal lines represent the boundaries between distinct atmospheric layers. 
+
+Circles are used to depict model data and the '+' signs represent measurements. Blue color signifies raw data, black color corresponds to interpolated data, and red color indicates the representative data for each layer. Specifically, a red circle within a layer represents the mean of all black circles in that layer. Similarly, a red '+' sign in a layer stands for the mean of all black '+' signs in that layer. Mismatches in terms of wind speed are depicted by the distances between red circles and red '+' signs. The wind speed (WSPD) plots for the entire campaign can be found at: [Wind Speed Visualization](./Data/WSPD_figures).
 
 ### Wind Direction Analysis
 
 ![Wind Direction Plot](./Data/WDIR_figures/wdir_06-Aug-2021_12_00_00.png)
 
-The above plot visualizes the relationship between wind direction and altitude. The complete set of wind direction plots can be found in the [Wind Direction Visualization](./Data/WDIR_figures) section.
+Analogously, in the wind direction plots, the degree indicates wind direction, and the radius denotes altitude. The upper plot is an enlarged version of the bottom plot for the first three atmospheric layers. Nested circles delineate the boundaries of the atmospheric layers. 
+
+Circles in these plots symbolize model data, while cross signs illustrate measurement data. For the upper diagram, magenta color depicts raw data, black color shows interpolated data, and red color indicates representatives. For the lower diagram, blue color represents raw data, and red color designates representatives. Mismatches in terms of wind direction are visualized by the distances between red signs. The wind direction (WDIR) plots for the entire campaign can be found at:[Wind Direction Visualization](./Data/WDIR_figures).
 
 Both the original data and the computed mismatches are saved for future reference and can be accessed in the [Data Repository](./Data/Lidar_ERA5_representatives).
 
@@ -113,9 +141,7 @@ To derive these weights, we propose the following steps:
 
 ## Scaling Data Output
 
-The outcome of this process is a 2D scaling matrix covering the entire campaign, together with the daily scaling factors. Access this data at the following location:
-
-[Scaling Data](./Data/Scaling_factors)
+The outcome of this process is a 2D scaling matrix covering the entire campaign, together with the daily scaling factors. Access this data at the following location: [Scaling Data](./Data/Scaling_factors)
 
 # Derivation of Weighting Factors via Footprint Intensities 
 
@@ -125,21 +151,15 @@ The first CSV column represents the date and time, the second column indicates t
 
 These factors are computed by multiplying the scaling factor for the respective day by the footprint intensities, essentially the sum of all elements of the 2D footprint image, per layer. Each column from the third onwards corresponds to a particular atmospheric layer. 
 
-All factors are normalized to ensure the sum in each row equals 1. The output CSV document is available at:
-
-[Footprint intensities with scaling factors](./Data/HAM_large_footprint_intensities_with_scaling_factors)
+All factors are normalized to ensure the sum in each row equals 1. The output CSV document is available at: [Footprint intensities with scaling factors](./Data/HAM_large_footprint_intensities_with_scaling_factors)
 
 The computed weighting factors are averaged across the instruments (mb, mc, md, me) and normalized again. The normalized weighting factors are then depicted as images with scaled colors, similar to the previous visualizations.
 
-Find these output images at:
-
-[Weighting factors images](./Data/Weighting_factors_images)
+Find these output images at: [Weighting factors images](./Data/Weighting_factors_images)
 
 # Correlation Between Weighting Factors and Mismatches
 
-Weighting factors for the chosen day (06-Aug-2021) can be accessed here:
-
-[06-Aug-2021](./Data/Weighting_factors_images/weihgting_factors_2021-08-06.png)
+Weighting factors for the chosen day (06-Aug-2021) can be accessed here: ![06-Aug-2021](./Data/Weighting_factors_images/weihgting_factors_2021-08-06.png)
 
 In this image, the sum of a column equals 1, signifying the variable footprint intensities depending on the planetary boundary layer.
 
@@ -172,12 +192,8 @@ For reference, the mean and standard deviation values for a selection of days ar
 
 ## Visualizing Daily Weighted Histograms
 
-Weighted histogram plots on a daily basis are generated using the handy `histwc.m` function. This MATLAB function was provided by Mehmet Suzen and is available at [MATLAB Central File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/42493-generate-weighted-histogram). The mean and standard deviation of the daily mismatches are prominently displayed on these plots. 
+Weighted histogram plots on a daily basis are generated using the handy [histwc.m](./Scripts/histwc.m) function. This MATLAB function was provided by Mehmet Suzen and is available at [MATLAB Central File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/42493-generate-weighted-histogram). The mean and standard deviation of the daily mismatches are prominently displayed on these plots. 
 
-Check out an example for a specific day:
+Check out an example for a specific day: ![06-Aug-2021](./Data/Weighted_histograms/weighted_histograms_2021-08-06.png)
 
-[06-Aug-2021](./Data/Weighted_histograms/weighted_histograms_2021-08-06.png)
-
-You can access the weighted histograms for the entire campaign at:
-
-[Weighted_histograms](./Data/Weighted_histograms)
+You can access the weighted histograms for the entire campaign at: [Weighted_histograms](./Data/Weighted_histograms)
